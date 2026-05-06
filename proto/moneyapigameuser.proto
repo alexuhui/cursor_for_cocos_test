@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+// 服务注册名
+// 客户端会通过这个字段获取sname
+// 主命名空间：net.ihago
+// 子命名空间：ymicro (下面的服务类型对业务命名空间为保留字段)
+// 服务类型：srv/api/web/...
+// 服务名称：demo
+package net.ihago.money.api.gameuser;
+
+// go的包名，引用时因为有git的项目路径作为命名空间，这里用短和清晰的名词
+option go_package = "gameuser";
+option objc_class_prefix = "Gameuser";
+
+import "moneyapicommon.proto";
+
+
+// 以下根据业务实际情况编写
+// 表示一个gameuser服务.
+service Gameuser {
+	// 获取游戏信息(客户端活动中心)
+	rpc GetGameInfo(GetGameInfoReq) returns (GetGameInfoRes) {}
+
+	// 获取游戏banner信息(游戏上方)
+	rpc GetGameBanner(GetGameBannerReq) returns (GetGameBannerRes) {}
+
+	// 是否是游戏策略用户(游戏服务端调用)
+	rpc IsGameUser(IsGameUserReq) returns (IsGameUserRes) {}
+}
+
+// 消息类型
+enum GameuserUri {
+	kUriNone = 0;
+	kUriToast = 1;           	// Toast消息
+	kUriPlayStart = 2;      	// 体验券开始，解锁
+	kUriPlayEnd = 3;      		// 体验券到期结束，上锁
+}
+
+// 游戏用户通知消息
+message GameuserNotify {
+	common.Header header = 1;					// 规则:如果是房间广播，需要填写header的roomid字段，如果是单播和全服广播，不要填充header的roomid字段
+	int32 uri = 2;                  	// 参考 GameuserUri
+
+	ToastMsg toast_msg = 11;					// Toast消息
+	PlayStartMsg play_start_msg = 12;	// 体验券开始，解锁
+	PlayEndMsg play_end_msg = 13;			// 体验券到期结束，上锁
+}
+
+message ToastMsg {
+	string left_icon = 1;		// 左边图标，如有就显示
+	string msg = 2;					// 文案
+}
+
+message PlayStartMsg {
+}
+message PlayEndMsg {
+}
+
+// 获取游戏信息(客户端活动中心)
+message GetGameInfoReq {
+	repeated string game_id = 1; // 名称
+}
+
+// 获取游戏信息(客户端活动中心)
+message GetGameInfoRes {
+	common.Result result = 1;
+
+	map<string, string> game_label = 10; // 角标 gameid->url
+}
+
+// 是否是游戏策略用户
+message IsGameUserReq {
+	int64 uid = 1; 					// 用户uid
+	bool is_logingame = 2;  // 是否是登录游戏查询，后端需要这个事件
+}
+
+// 是否是游戏策略用户
+message IsGameUserRes {
+	common.Result result = 1;
+
+	bool is_gameuser = 10;
+}
+
+
+// 获取游戏banner信息(游戏上方)
+message GetGameBannerReq {
+}
+
+// 获取游戏banner信息(游戏上方)
+message GetGameBannerRes {
+	common.Result result = 1;
+
+	GameBanner  game_banner = 10;			// 入口
+}
+
+// 任务阶段类型
+enum TaskStage {
+	kStageNone = 0;
+	kStageTryPlay = 1;        // 试玩7天
+	kStageMonthTask = 2;      // 月任务阶段
+	kStagePlayEnd = 3;    		// 体验券结束阶段
+}
+
+// 通过 ikxd_through_d 服务透传
+// 服务Service  = "net.ihago.money.api.gameuser"
+// 服务uri = "GameBanner"
+// 入口数据变化通知
+message GameBanner {
+	int64 stage = 1;				// 阶段 参考TaskStage
+	int64 count_down = 2;	  // 倒计时
+	int64 cur = 3;					// 月任务当前值
+	int64 target = 4;			  // 月任务目标值
+	bool  is_flush = 5;		  // 是否刷新月任务
+}
+

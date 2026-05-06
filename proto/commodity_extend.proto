@@ -1,0 +1,60 @@
+syntax = "proto3";
+// 客户端会通过这个字段获取sname
+// 主命名空间：net.ihago
+// 子命名空间：marcus (下面的服务类型对业务命名空间为保留字段)
+// 服务类型：srv/api/web/...
+// 服务名称：example
+
+package net.ihago.money.api.globalmetadata;
+
+// go的包名，引用时因为有git的项目路径作为命名空间，这里用短和清晰的名词
+option go_package = "globalmetadata";
+option objc_class_prefix = "Globalmetadata";
+
+// 商品的资源属性
+// Note: 不同商品类型的资源属性对应CommodityExtend其中一个值,其余值为空。
+message CommodityExtend {
+  // infun 游戏代金券的资源属性
+  // Note: CommodityType.CommodityTypeInfunGameVoucher
+  InfunGameCouponExtend infun_game_vocher_extend           = 618;
+  // infun 游戏加成券的资源属性
+  // Note: CommodityType.CommodityTypeInfunGameBonusCoupon
+  InfunGameCouponExtend infun_game_bonus_coupon_extend     = 619;
+
+}
+
+// infun游戏卡券的资源属性. 代金券/加成券
+message InfunGameCouponExtend {
+  int64 valid_days     = 1; // 有效期天数. 发放之后x天过期
+  int64 addition_rate  = 2; // 加成比例. 加成券有效
+  int64 addition_limit = 3; // 加成上限. 加成券有效
+  int64 stock_limit    = 4; // 单人包裹数量上限
+  int64 deduct_amount  = 5; // 抵扣的价值. 代金券有效, 表示消费的时候抵扣多少钻石
+}
+
+// 资源格式类型
+enum ResourceType {
+  ResourceTypeNone = 0;
+  // svga 格式
+  ResourceTypeSvga = 1;
+  // png 格式
+  ResourceTypePng  = 2;
+  // jpg 格式
+  ResourceTypeJpg  = 3;
+  // webp 格式
+  ResourceTypeWebp = 4;
+  // mp4 格式
+  ResourceTypeMp4  = 5;
+  // zip 格式
+  ResourceTypeZip  = 6;
+}
+
+// 商品的资源
+message Resource {
+  // 资源的url
+  string resource_url        = 1;
+  // 资源的类型
+  ResourceType resource_type = 2;
+  // 资源的md5
+  string resource_md5        = 3;
+}

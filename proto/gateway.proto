@@ -1,0 +1,103 @@
+syntax = "proto3";
+package pbm;
+
+// Upstream 上行消息包，用于 ws -> gateway -> sdk 单向传输
+message Upstream {
+    // 消息路径, 路由规则分发的依据
+    // 特殊路径:
+    //   - reserved.gateway.ping: ws -> gateway ping包
+    string path               =  1;
+    // 消息序列号, request/response模型的回包或定位请求
+    // seq由client端产生, 从1开始且每次发送自增1
+    int64  seq                =  2;
+    // 连接标识ID, 每条websocket连接会产生一个唯一的conn_id，用于上下行消息包异步收发组装及信令收发
+    // conn_id由gateway产生
+    string conn_id            =  3;
+    // 用户id
+    string uid                =  4;
+    // 房间id
+    string room_id            =  5;
+    // 消息头部, 扩展字段的传递
+    map<string, string> header = 12;
+    // body数据类型, 使用HTTP协议标准
+    string content_type        = 13;
+    // body数据名称
+    // 特殊名称:
+    //   - net.ihago.gme.srv.sidecar_gateway.GMEInternalEnterRoom: 用户进入房间
+    //   - net.ihago.gme.srv.sidecar_gateway.GMEInternalLeaveRoom: 用户退出房间
+    string body_name          = 14;
+    // 实际数据体
+    bytes  body               = 15;
+}
+
+// Downstream 下行消息包，用于 ws <- gateway <- sdk 单向传输
+message Downstream {
+    // 消息路径, 路由规则分发的依据
+    // 特殊路径:
+    //   - reserved.gateway.pong: ws <- gateway pong包
+    string path               =  1;
+    // 消息序列号，request/response模型如需回包则填写与对应上行消息相同的seq
+    // 其余情况seq应该为0
+    int64  seq                =  2;
+    // 连接标识ID, 每条websocket连接会产生一个唯一的conn_id，用于上下行消息包异步收发组装及信令收发
+    // conn_id由gateway产生
+    string conn_id            =  3;
+    // 用户id
+//    string uid                =  4;
+    // 房间id
+    string room_id            =  5;
+    // 状态码, 见 <status_code.proto:StatusCode>
+    int64 status_code         = 11;
+    // 消息头部, 扩展字段的传递
+    map<string, string> header = 12;
+    // body数据类型, 使用HTTP协议标准
+    string        content_type = 13;
+    // body数据名称
+    // 特殊名称:
+    //   - net.ihago.gme.srv.sidecar_gateway.GMEInternalEnterRoom: 用户进入房间
+    //   - net.ihago.gme.srv.sidecar_gateway.GMEInternalLeaveRoom: 用户退出房间
+    string body_name          = 14;
+    // 实际数据体
+    bytes  body               = 15;
+}
+
+// GMEInternalEnterRoom 进入房间通知
+message GMEInternalEnterRoom {
+    // 进入房间的用户UID (仅下行使用)
+    string uid       = 1;
+    // 自定义数据
+    bytes  user_data = 2;
+}
+
+// LeaveRoomReason 用户离开房间原因
+enum LeaveRoomReason {
+    // 用户主动退出
+    ClientExit           = 0;
+    // 踢出房间
+    Kick                 = 1;
+    // 用户掉线
+    ClientConnectionLost = 2;
+    // 服务端掉线
+    ServerConnectionLost = 3;
+}
+
+// GMEInternalLeaveRoom 退出房间通知
+message GMEInternalLeaveRoom {
+    // 退出房间的用户UID (仅下行使用)
+    string uid             = 1;
+    // 自定义数据
+    bytes  user_data       = 2;
+    // 退出原因
+    LeaveRoomReason reason = 3;
+}
+message GMEHeartBeatReq{
+}
+
+message GMEHeartBeatRes{
+}
+
+// Gateway 网关传输通道
+service Gateway {
+    // 上下行消息通道
+    rpc StreamingChannel(stream Upstream) returns (stream Downstream) {}
+}

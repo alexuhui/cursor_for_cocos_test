@@ -1,0 +1,65 @@
+{
+    "quickPicks": [
+        {
+            "name": "quick_update_tools",
+            "root": true,
+            "displayInfo": {
+                "label": "工具合集",
+                "detail": "一些不常用的工具放在这个条目内"
+            },
+            "pickTrigger": {
+                "type": "quickPick",
+                "names": ["quickPick_updateTools", "quickPick_updateGea", "quickPick_compile_ts_tools", "quickPick_tslint_fix_all"]
+            }
+        },
+        {
+            "name": "quick_init_project",
+            "root": true,
+            "displayInfo": {
+                "label": "初始化项目",
+                "description": "此命令就是在当前工作区下安装一些必要的库",
+                "detail": "1.protobufjs库,2.laya项目时安装layaair2-cmd库用于发布laya项目并且设置相关的编译入口,3.npm install安装需要的npm包"
+            },
+            "pickTrigger": {
+                "type": "shell",
+                "names": ["shell_init_project"]
+            }
+        },
+        {
+            "name": "quick_generate_pb",
+            "root": true,
+            "displayInfo": {
+                "label": "生成pb文件",
+                "detail": "自动解析proto文件,生成对应的pb文件和PBEnums文件"
+            },
+            "pickTrigger": {
+                "type": "shell",
+                "names": ["shell_generate_pb"]
+            }
+        },
+        {
+            "name": "quick_publish",
+            "root": true,
+            "displayInfo": {
+                "label": "发布项目",
+                "detail": "发布成功生成release.zip文件到当前工作区的根目录"
+            },
+            "pickTrigger": {
+                "type": "shell",
+                "names": ["shell_publish"]
+            }
+        }
+    ],
+    "shells": [
+        {
+            "name": "shell_init_project",
+            "shell": "node",
+            "args": ["../tools/init-project.js"]
+        },
+        {
+            "name": "shell_generate_pb",
+            "shell": "node",
+            "args": ["../tools/protobuf2js/main.js"]
+        }
+    ]
+}

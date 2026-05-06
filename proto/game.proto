@@ -1,0 +1,576 @@
+//path='game'
+syntax = "proto3";
+
+package pbm;
+
+import "common.proto";
+import "commodity_common.proto";
+import "metadata_commodity.proto";
+
+enum ERetCode {
+  ERetCodeSuccess = 0;      // 请求成功
+  ERetSystem = 999;         // 系统错误
+  ERetInvalidPlayer = 1000; // 玩家不存在, 可能未调用enterRoom
+  ERetTooFrequent = 1001;   // 操作太频繁
+  ERetInvalidParams = 1002; // 参数错误
+
+  ERetBlock = 10001;               // 禁止登录
+  ERetVipNotEnough = 10002;        // vip等级不足
+  ERetInsufficientBalance = 10003; // 余额不足
+  ERetFreezeAccount = 22;          // 账户冻结, 通用错误码指定22
+  ERetAlreadyAutoBet = 10004; // 已经在自动下注了
+  ERetMaintain = 10005; // 维护中
+
+  ERetNotRecoveryPhase = 11001; // 回收阶段不对
+  ERetAlreadyRecovery = 11002;  // 已回收
+}
+
+// 登录返回
+message LoginGameRes {
+  common.Result result = 1;
+
+  int64 vip_level = 10; // 用户当前vip等级
+  int64 need_vip = 11;  // 需要vip等级
+  int32 guided = 12;    // 完成引导版本, 用数字表示防止以后要有多个引导
+  repeated Mission missions = 13; // 任务
+  bool is_show_white = 14; // 是否是展示白名单
+  bool has_red_diamond_entry = 15; // 是否有红钻入口
+  int32 red_diamond_switch = 16; // 红钻开关状态, 1=红钻, 2=新钻
+}
+
+message Mission {
+  int32 id = 1;             // 任务id, 1-2
+  int32 type = 2;           // 任务类型, 参照EMissionType
+  string param = 3;         // 额外参数
+  int64 goal = 4;           // 任务目标
+  int64 score = 5;          // 当前值
+  int32 reward_quality = 6; // 奖励品质, 参照ERewardQuality
+  int32 status = 7;         // 任务状态, 参照EMissionStatus
+}
+
+//任务类型
+enum EMissionType {
+  EMissionTypeNone = 0;
+  EMTDailyConsume = 1; // 累积钻石投入
+  EMTDailyRecover = 2; // 回收火箭任务
+}
+
+//任务状态
+enum EMissionStatus {
+  EMissionStatusNone = 0;
+  EMSUnclaimable = 1; // 不能领取, 未完成
+  EMSClaimable = 2;   // 可领取, 已完成
+  EMSClaimed = 3;     // 已领取
+}
+
+//任务奖励
+enum ERewardQuality {
+  ERewardQualityNone = 0;
+  ERQNormal = 1; // 普通, 低
+  ERQGood = 2; // 优秀, 中
+  ERQSuperior = 3; // 精良, 高
+
+  ERQInfinity = 100; // 无限任务
+}
+
+message MissionInfoRes {
+  repeated Mission missions = 1;
+}
+
+message MissionRewardReq {
+  int32 id = 1;
+}
+
+message MissionRewardRes {
+  common.Result result = 1;
+  commodity.CommodityReward rewards = 2;         // 奖励
+  repeated commodity.CommodityReward others = 3; // 没有中的奖励
+  int32 id = 4; // 任务id
+}
+
+message GetTaskEntranceReq {
+}
+
+message GetTaskEntranceRes {
+  int32 code = 1;
+  string msg = 2;
+  int64 sequence = 3;
+
+  // 用户身份类型, 1:回归用户，2：新手用户，3：大客用户
+  int32 userType = 10;
+  // 任务状态, 0: 无任务权限，1：任务进行中，2：任务已结束
+  int32 taskStatus = 11;
+  // 任务倒计时, 单位秒
+  int64 leftTime = 12;
+  // 是否有待领取的奖励(红点)
+  bool hasUnclaimedReward = 13;
+}
+
+// 获取游戏配置
+message GetGameConfigReq {}
+
+message Gear {
+  int64 amount = 1; // 钻石数
+}
+
+message BetConfig {
+  repeated Gear gears = 1;        // 下注档位
+  repeated int64 auto_rounds = 2; // 自动轮次数
+  int64 max_bet_amount = 3; // 最大下注钻石数
+  int64 min_bet_amount = 4; // 最小下注钻石数
+}
+
+message Speed {
+  int64 begin = 1;    // 区域开始
+  int64 end = 2;      // 区域结束, 不包含
+  int64 mill_sec = 3; // 火箭在 mill_sec 毫秒内会上升0.01倍率
+}
+
+message RocketConfig {
+  repeated Speed speeds = 1; // 火箭升空速率
+  int64 max_multiple = 2;    // 火箭最高倍率
+
+  int64 choose_sec = 10;  // 下注时间
+  int64 prepare_sec = 11; // 准备时间
+  int64 bomb_sec = 12;    // 爆炸时间, 3个的单位都是秒
+}
+
+message RankRewardConfig {
+  int32 rank = 1;
+  commodity.CommodityReward reward = 2;
+}
+
+message GetGameConfigRes {
+  common.Result result = 1;
+
+  BetConfig bet = 2;       // 下注相关配置
+  RocketConfig rocket = 3; // 火箭相关配置
+
+  repeated net.ihago.money.api.metadata.CommoditySpecified preload_rewards = 10; // 预加载奖励信息
+  repeated RankRewardConfig rank_rewards = 11; // 排行榜奖励
+}
+
+// 完成引导
+message FinishGuideReq {
+  int32 guide = 1; // 完成引导版本, 用数字表示防止以后要有多个引导
+}
+
+// 查询余额
+message GetCoinReq {}
+
+message GetCoinRes {
+  common.Result result = 1;
+
+  int64 diamond = 2; // 钻石
+}
+
+// 查询vip等级限制
+message GetVipLevelReq {}
+
+message GetVipLevelRes {
+  common.Result result = 1;
+
+  int32 vip_level = 2;      // hago vip等级
+  int32 need_vip_level = 3; // 开启游戏需要的vip等级
+  bool freeze = 4;          // vip是否冻结
+}
+
+// 查询用户今日收入
+message GetTodayIncomeReq {}
+
+message GetTodayIncomeRes {
+  common.Result result = 1;
+  int64 value = 2; // 今日收入
+}
+
+// 获取火箭记录, 爆炸倍率
+message GetRocketRecordsReq {}
+
+message RocketRecord {
+  string round = 1;
+  int64 multiple = 2; // 爆炸时的返奖倍率
+}
+
+message GetRocketRecordsRes {
+  common.Result result = 1;
+
+  repeated RocketRecord records = 2;
+}
+
+// 查询本轮榜单
+message GetRoundRankReq {
+  string cid = 1;       // 房间id, 空表示查全区
+  bool only_amount = 2; // 只返回下注钻石数
+}
+
+message RoundRankItem {
+  string uid = 1;
+  int64 rank = 2;     // 用户排名
+  int64 amount = 3;   // 下注钻石数
+  int64 multiple = 4; // 回收倍率
+  string nick = 5;    // 用户昵称
+  string avatar = 6;  // 用户头像
+}
+
+message GetRoundRankRes {
+  common.Result result = 1;
+  string cid = 2;
+
+  string round = 10;                // 轮次号
+  int64 round_bet = 11;             // 本轮下注钻石数
+  int64 round_users = 12;           // 本轮下注用户数
+  repeated RoundRankItem list = 13; // top用户
+}
+
+// 查询当前轮信息
+message GetCurrentRoundReq {}
+
+enum EPhase {
+  EPhaseNone = 0;
+  EPBet = 1;     // 下注阶段
+  EPPrepare = 2; // 准备阶段(升空前)
+  EPRush = 3;    // 升空阶段
+  EPBomb = 4;    // 爆炸阶段
+}
+
+message RoundInfo {
+  string round = 1;   // 轮次号
+  EPhase phase = 2;   // 当前阶段
+  int64 phase_ts = 3; // 阶段结束秒时间戳, 升空阶段该字段为0
+  int64 multiple = 4; // 火箭返奖倍率
+  int64 phase_begin_ts = 5; // 阶段开始秒时间戳, 只有升空阶段会返回
+}
+
+message GetCurrentRoundRes {
+  common.Result result = 1;
+  int64 choose_amount = 2; // 当前钻石下注金额
+  int64 auto_multiple = 3; // 当前轮自动回收倍率
+  int64 multiple = 4;      // 回收倍率
+  RoundInfo info = 5;      // 当前轮次信息
+  AutoInfo auto_info = 6;  // 自动下注信息
+  int64 ticket_amount = 7; //当前轮代金劵下注金额
+
+  string next_round = 10;   // 下轮轮次号
+  int64 srv_ts = 11; // 服务端当前时间戳, 秒
+  int64 next_choose_amount = 12; // 下轮下注金额
+  int64 next_auto_multiple = 13; // 下轮自动回收倍率
+  int64 next_ticket_amount = 14; // 下轮代金劵下注金额
+}
+// 下发当前轮次信息
+message CurrentRoundRes {
+  RoundInfo info = 1;
+  string next_round = 2;
+  int64 srv_ts = 3; // 服务端当前时间戳, 秒
+  RocketConfig rocket = 4; // 火箭相关配置
+}
+
+// 下发火箭倍率
+message RocketMultipleRes {
+  string round = 1;
+  int64 multiple = 2;
+  int64 sequence = 3;
+}
+
+// 下发回收用户
+message RecoveryUserRes {
+  string round = 1;
+  string uid = 2;
+  int64 multiple = 3;
+  string avatar = 4;
+}
+
+enum ECurrencyType {
+  ECurrencyTypeNone = 0;
+  ECTDiamond = 1805;
+  ECTNewDiamond = 1835;
+  ECTVoucher = 50044; // 游戏代金券
+}
+
+//参与下注代金劵信息
+message BetTicket {
+  int64 id = 1;
+  int64 num = 2; // 代金劵数量
+  int64 amount = 3; // 代金劵钻石数
+}
+
+// 下注
+message BetReq {
+  int64 sequence = 1;
+  string round = 2;
+  int32 currency_type = 3; // 下注货币类型, 参照ECurrencyType
+  int64 amount = 4;        // 下注钻石数
+  int64 auto_multiple = 5; // 自动回收倍率, =0表示没有自动回收
+  string cid = 6; // 下注时的房间号
+  int64 ticket_id = 7; // 代金劵id
+}
+
+message BetRes {
+  common.Result result = 1;
+
+  string round = 2;
+  int64 total_amount = 3;  // 总下注钻石数
+  int64 auto_multiple = 4; // 自动回收倍率, =0表示没有自动回收
+  int64 ticket_amount = 5; // 代金劵钻石数
+  int64 diamond_amount = 6; // 钻石钻石数
+}
+
+// 自动回收
+message AutoRecoveryReq {
+  int64 sequence = 1;
+  string round = 2;
+  int64 auto_multiple = 3; // 自动回收倍率, =0表示没有自动回收
+}
+
+message AutoRecoveryRes {
+  common.Result result = 1;
+
+  string round = 2;
+  int64 total_amount = 3;  // 总下注钻石数
+  int64 auto_multiple = 4; // 自动回收倍率, =0表示没有自动回收
+}
+
+// 回收火箭
+message RecoveryReq { string round = 1; }
+
+message RecoveryRes {
+  common.Result result = 1;
+
+  string round = 2;
+  int64 bet_amount = 3; // 下注钻石数
+  int64 win_amount = 4; // 回收钻石数
+  int64 multiple = 5;   // 回收倍率
+  int64 ticket_num = 6; // 本轮使用代金劵总数量
+  repeated BetTicket tickets = 7; //使用代金劵信息
+}
+
+message GetRecordsReq { common.Page page = 1; }
+
+message UserRecord {
+  int64 ts = 1;
+  string round = 2;
+  int64 win_amount = 3;    // 中奖金额
+  int64 win_multiple = 4;  // 回收倍率
+  int64 bomb_multiple = 5; // 爆炸倍率
+  repeated BetTicket tickets = 6; //使用代金劵信息
+}
+
+message GetRecordsRes {
+  common.Result result = 1;
+  bool has_more = 2;    // 是否还有下一页
+  common.Page page = 3; // 请求下一页时传该字段
+
+  int64 today_income = 10; // 只有第一次请求返回
+  int64 month_income = 11; // 只有第一次请求返回
+  repeated UserRecord records = 12;
+  int64 today_ticket_value = 13; //今日使用代金劵总价值
+}
+
+// 自动下注
+message AutoBetReq {
+  int32 currency_type = 1; // 下注货币类型, 参照ECurrencyType
+  int64 amount = 2;        // 下注钻石数
+  int64 rounds = 3;        // 持续轮数
+  int64 auto_multiple = 4; // 自动回收倍率
+}
+
+message AutoBetRes { common.Result result = 1; }
+
+enum EAutoStatus {
+  EAutoStatusNone = 0;
+  EASNotStart = 1; // 为开始
+  EASOngoing = 2;  // 进行中
+  EASEnd = 3;      // 已结束
+}
+
+enum EAutoReason {
+  EAutoReasonNone = 0;
+  EARHand = 1;        // 手动关闭
+  EARBalance = 2;     // 余额不足
+  EARServerError = 3; // 服务报错
+  EARFinish = 4; // 完成
+  EARMaintain = 5; // 维护中
+}
+
+message AutoInfo {
+  EAutoStatus status = 1;  // 自动下注状态
+  int64 auto_rounds = 2;   // 自动下注轮数
+  int64 ran_rounds = 3;    // 已进行轮数
+  int64 round_amount = 4;  // 每局下注钻石数
+  int64 total_consume = 5; // 累计消费
+  int64 total_earn = 6;    // 累计收益
+  EAutoReason reason = 7;  // 结束理由
+  string id = 8; // 自动下注id
+}
+
+// 取消自动下注
+message CancelAutoReq {}
+
+message CancelAutoRes { common.Result result = 1; }
+
+// 排行榜
+message GetRankReq {
+  int32 day_offset = 1; // 时间偏移, 0表示查今天, -1表示查昨天, 目前只支持0和-1
+}
+
+message GetRankRes {
+  common.Result result = 1;
+
+  int32 day_offset = 10;
+  repeated RoleRankData rank_list = 11; // 排行榜列表
+  RoleRankData my_rank = 12; // 自己的排名信息 rank可能为0，表示排名500+
+  int64 remain_seconds = 13; // 当前大区的日榜剩余时长,秒
+  RoleRankData yesterday_top_rank = 14; // 昨天的排行榜第一名
+  int64 cumulative_number = 15;         // 累计霸榜次数
+}
+
+// 排行榜奖励通知, 用于通知玩家领取奖励
+message RankRewardNotifyRes {
+  common.Result result = 1;
+
+  string rank_date = 11;                 // 排行榜日期
+  int64 rank = 12;                       // 排名
+  string uid = 13;                       // 用户uid
+  commodity.CommodityReward reward = 14; // 榜单奖励
+}
+
+message RoleRankData {
+  string uid = 1;           // 用户uid
+  int64 score = 2;          // 榜单得分
+  int64 rank = 3;           // 未进入排名时返回0
+  string avatar = 4;        // 头像
+  string avatar_frame = 5;  // 头像框
+  string nick = 6;          // 昵称
+  NobleIcon noble_icon = 7; // 贵族icon
+  VipInfo vip_info = 8;     // vip信息
+}
+
+// 贵族的icon配置
+message NobleIcon {
+  string bg_icon = 1;        // 背景图
+  string brand_icon = 2;     //	贵族icon
+  string big_brand_icon = 3; //	贵族icon h5用
+  int64 icon_id = 4;         // 配置编号id,比如1001
+}
+
+message VipInfo {
+  string bg_icon = 1;           // 正常状态时-背景图
+  string brand_icon = 2;        // 正常状态时-vip icon
+  string frozen_bg_icon = 3;    // 冻结状态时-背景图
+  string frozen_brand_icon = 4; // 冻结状态时-vip icon
+  int64 vip_level = 5;          // 用户vip等级
+  string sub_type = 6;          // vip等级的状态 正常=normal  冻结=frozen
+}
+
+message TestCmdReq {
+  int64 cmd = 1;   //
+  int64 param = 2; // 额外参数-暂不填充
+}
+
+message TestCmdRes { common.Result result = 1; }
+
+// 上报数据
+message ReportReq {
+  string os = 1;             // 1: PC  2: Android  3: ios
+  string client_version = 2; // 客户端版本
+  string client_name = 3;    // 客户端包名
+}
+
+message ReportRes { common.Result result = 1; }
+
+// 上报来源和语音房CID
+message CidReq {
+  string cid = 1;
+  int64 openScene = 2;
+  string from = 3;
+  string voiceRoomData = 4;
+}
+
+message CidRes { common.Result result = 1; }
+
+message CommoditySpecified {
+  // 商品类型
+  commodity.CommodityType commodity_type = 1;
+  // 商品ID
+  int64 commodity_id                     = 2;
+  // 版本号,传0就返回最新的商品
+  int64 version = 3;
+}
+
+// 商品信息筛选
+message CommodityFilter {
+  // 多语言过滤, 仅会返回指定的一种语言
+  string language = 1;
+}
+
+// 批量获取商品信息
+message BatchGetCommoditiesReq {
+  // 商品列表
+  repeated CommoditySpecified commodities = 1;
+  // 商品信息筛选
+  CommodityFilter filter                  = 2;
+}
+
+// 资源格式类型
+enum ResourceType {
+  ResourceTypeNone = 0;
+  // svga 格式
+  ResourceTypeSvga = 1;
+  // png 格式
+  ResourceTypePng  = 2;
+  // jpg 格式
+  ResourceTypeJpg  = 3;
+  // webp 格式
+  ResourceTypeWebp = 4;
+  // mp4 格式
+  ResourceTypeMp4  = 5;
+  // zip 格式
+  ResourceTypeZip  = 6;
+}
+
+// 商品的资源
+message Resource {
+  // 资源的url
+  string resource_url        = 1;
+  // 资源的类型
+  ResourceType resource_type = 2;
+  // 资源的md5
+  string resource_md5        = 3;
+}
+
+message Commodity {
+  // 商品ID
+  int64 commodity_id = 2;
+  // 商品品类型
+  commodity.CommodityType commodity_type = 3;
+  // 多语言标注的商品名
+  map<string, string> languages = 9;
+  // 默认图标
+  Resource icon = 11;
+  // h5图标
+  Resource h5_icon = 12;
+}
+
+message BatchGetCommoditiesRes {
+  // 返回结果
+  common.Result result = 1;
+  // 需要更新商品信息
+  repeated Commodity commodities = 10;
+  // 已经缓存的商品列表(业务缓从的商品信息已经是最新的，不需要再更新)
+  repeated CommoditySpecified cached_commodities = 11;
+}
+
+// 游戏配置变更, 收到通知后需要请求GetGameConfigReq+GetTodayIncomeReq+GetCurrentRoundReq接口刷新配置
+message GameConfigChangeRes {
+  common.Result result = 1;
+}
+
+
+//设置红钻状态
+message SetRedDiamondSwitchReq {
+  int32 red_diamond_switch = 1; // 红钻开关状态, 1=红钻, 2=新钻
+}
+
+message SetRedDiamondSwitchRes {
+  common.Result result = 1;
+}
+

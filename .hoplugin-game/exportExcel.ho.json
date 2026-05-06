@@ -1,0 +1,74 @@
+{
+    "supers": [],
+    "quickPicks": [
+        {
+            "name": "quick_export_excel_tools",
+            "root": true,
+            "displayInfo": {
+                "label": "导出excel数据",
+                "detail": "导出excel的工具合集"
+            },
+            "pickTrigger": {
+                "type": "quickPick",
+                "names": ["quick_export_excel", "quick_generateTsManager"]
+            }
+        },
+        {
+            "name": "quick_export_excel",
+            "access": "public",
+            "root": false,
+            "displayInfo": {
+                "label": "导出excel数据到项目",
+                "description": "",
+                "detail": "导出excel文件为json，并且声称对应的类文件和加载文件"
+            },
+            "pickTrigger": {
+                "type": "selectFile",
+                "names": ["select_excels"]
+            }
+        },
+        {
+            "name": "quick_generateTsManager",
+            "access": "public",
+            "displayInfo": {
+                "label": "更新excel数据加载类",
+                "description": "",
+                "detail": "删除已经不存在json文件对应的类,从新生成加载类文件"
+            },
+            "pickTrigger": {
+                "type": "shell",
+                "names": ["shell_updateTs"]
+            }
+        }
+    ],
+    "shells": [
+        {
+            "name": "shell_excelExport",
+            "shell": "node ../tools/exlExport/main.js",
+            "args": []
+        },
+        {
+            "name": "shell_updateTs",
+            "shell": "node ../tools/exlExport/generateTsManager.js"
+        }
+    ],
+    "selectFiles": [
+        {
+            "name": "select_excels",
+            "option": {
+                "canSelectFiles": true,
+                "canSelectFolders": false,
+                "canSelectMany": true,
+                "openLabel": "选择Excel文件",
+                "defaultPaths": [],
+                "filters": {
+                    "Excels": ["xlsx"]
+                }
+            },
+            "selectTrigger": {
+                "type": "shell",
+                "names": ["shell_excelExport"]
+            }
+        }
+    ]
+}

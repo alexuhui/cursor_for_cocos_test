@@ -1,0 +1,76 @@
+//path='game'
+syntax = "proto3";
+
+// 服务注册名
+// 客户端会通过这个字段获取sname
+// 主命名空间：net.ihago
+// 子命名空间：ymicro (下面的服务类型对业务命名空间为保留字段)
+// 服务类型：srv/api/web/...
+// 服务名称：demo
+package net.ihago.game.api.notify;
+
+// go的包名，引用时因为有git的项目路径作为命名空间，这里用短和清晰的名词
+option go_package = "notify";
+option objc_class_prefix = "Notify";
+
+import "moneyapicommon.proto";
+import "commodity_common.proto";
+
+
+// 以下根据业务实际情况编写
+// 表示一个gamenotify服务.
+service GameNotify {
+
+    // 新玩法单局最高获奖横幅
+    // 获取横幅
+    rpc GetGrandPrizeBanner(GetGrandPrizeBannerReq) returns (GetGrandPrizeBannerRes) {}
+    // 点赞
+    rpc Like(LikeReq) returns (LikeRes) {}
+}
+
+enum ERetCode {
+	RET_NONE = 0;
+
+	ERC_NotInRoom = 10000; // 用户不在房间内
+}
+
+message GetGrandPrizeBannerReq{
+    string game_id = 1;
+    int64 user_id = 2;
+}
+
+message GrandPrizeBanner{
+    string user_img = 1;
+    string user_name = 2;
+    int64 reward_prize = 4; //中奖金额
+    string banner_id = 5; //横幅id
+    int64 like_count = 6; //总点赞数
+    bool liked = 7; // 是否已点赞
+    int64 my_like_count = 8; // 当日我的点赞数
+    int64 user_like_limit = 9; // 当日单人点赞上限
+}
+
+message GetGrandPrizeBannerRes{
+    common.Result result = 1;
+    string game_id = 2;
+    GrandPrizeBanner grand_prize_banner = 3;
+    int64 next_refresh_time = 4; //下次拉接口间隔时间, 单位:秒
+}
+
+message LikeReq{
+    int64 user_id = 1;
+    string game_id = 2;
+    string banner_id = 3;//横幅id
+    string cid = 4; // 用户所在频道, 上报需要
+    string game_ver = 5; // 游戏版本号, 上报需要
+}
+
+message LikeRes{
+    common.Result result = 1;
+    string banner_id = 2; // 透传req
+    int64 like_count = 3; // 横幅总点赞数
+    int64 my_like_count = 4; // 我的点赞数
+    int64 user_like_limit = 5; // 单个横幅单人点赞上限
+    commodity.CommodityReward reward = 6; // 奖励
+    int64 rewarded_cnt = 7; // 已奖励次数, 不需要买点上报就不返回了
+}

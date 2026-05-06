@@ -1,0 +1,136 @@
+syntax = "proto3";
+
+// 服务注册名
+// 客户端会通过这个字段获取sname
+// 主命名空间：net.ihago
+// 子命名空间：ymicro (下面的服务类型对业务命名空间为保留字段)
+// 服务类型：srv/api/web/...
+// 服务名称：demo
+package net.ihago.ymicro.api.revenue;
+
+// go的包名，引用时因为有git的项目路径作为命名空间，这里用短和清晰的名词
+option go_package = "revenue";
+option objc_class_prefix = "Revenue";
+
+import "moneyapicommon.proto";
+
+
+// 以下根据业务实际情况编写
+// 表示一个turnover服务.
+service Turnover {
+  // 查询优惠券汇总列表和小红点信息
+  rpc QueryCouponSummary(QueryCouponSummaryReq) returns (QueryCouponSummaryRes) {}
+
+  // 设置消息已读
+  rpc ReadMessage(ReadMessageReq) returns (ReadMessageRes) {}
+}
+
+// 基本错误码，错误码>=2000，客户端均可重试
+enum RetCode {
+  kRetCodeOk = 0;
+  // 1xxx 基础错误码，如参数错误等
+  kTokenUidNotExist = 1001;       // Token uid参数没有传过来
+  kParamError = 1002;             // 请求参数判断出错
+  kParamSnameError = 1003;        // 请求参数Sname为空
+  kParamSeqIdError = 1004;        // 请求参数SeqId格式不对
+  kBatchGetOverLimit = 1005; // 查询请求超过限制
+  kServerDenied = 1006; // 请求被服务器拒绝
+
+  // 2xxx 数据库相关错误码
+  kMySqlExecError = 2001; // mysql操作失败
+  kRedisError = 2002; // redis操作失败
+
+  // 3xxx 服务错误码
+  kMoneyTurnOverError = 3000; // MoneyTurnOver服务器内部错误
+  kInvokingThriftError = 3001; // 营收中心Thrift接口调用失败
+  kAddPropsActivityLimit = 3002; // 发放活动道具接口 2:超出限额
+  kAddPropsActivityRepeated = 3003; // 活动道具重复添加
+  kAddPropsConcurrentUpdateErr = 3004; // 并发添加道具失败
+  kIssueCurrencyNewExpire = 3010; // 为用户发放货币 0：超过时效，活动已过时
+  kIssueCurrencyNewTotalLimit = 3011; // 为用户发放货币 2:当日发放的白水晶总量已达上限，发放失败
+  kIssueCurrencyNewUserLimit = 3012; // 为用户发放货币 3:当日个人发放的白水晶总量已达上限，发放失败；
+  kIssueCurrencyRepeated = 3013; // 发放货币重复
+  kIssueCurrencyConcurrentUpdateErr = 3014; // 并发发放货币失败
+  KIssueInnerAccount = 3015; // 发放货币和道具 内部账户（普通账户角色）限制，不允许发放
+  kIssueCouponLimit = 3020; // 发放优惠券接口 2 超出限额
+  kIssueCouponRepeated = 3021; // 发放优惠券重复
+  kPayProductParamError = 3030; // 消费接口 102=支付参数错误
+  kPayProductLimit = 3031; // 消费接口 103=支付金额限制
+  kPayProductOrderError = 3032; // 消费接口 101=营收下单本地错误
+  kPayProductOrderFaild = 3033; // 消费接口 2=下单失败
+  kPayProductWaitePay = 3034; // 消费接口 3=等待用户支付
+  kPayProductOrderRepeat = 3035; // 消费接口 6=订单重复
+  kPayProductOrderClose = 3036; // 消费接口 7=订单关闭
+  kPayProductBalanceNoEnough = 3037; // 消费接口 8=余额不足
+  kPayProductOrderException = 3038; // 消费接口 -1=订单异常
+  kPayProductFreeze = 3039; // 消费接口 104=货币账户冻结
+  kPayProductGoldToDiamondRateNotMatch = 3040; //  消费接口 107= 金豆消费业务传入消耗金豆与营收配置比率*钻石数值不一致错误
+  kPayProductOrderAlreadyDeduct = 3041; // 消费接口 -405=seq已经被成功扣费(用于报错重试场景)
+  kConsumePayNotBuy = 3200; // 消费钻石购买礼物 -41 道具不可购买
+  kConsumePayNotDiamond = 3201; // 消费钻石购买礼物 -23 余额不足
+  kConsumePayParamErr = 3202; // 消费钻石购买礼物 -400 参数错误
+  kConsumePayRepeated = 3203; // 重复消费（订单号重复） -405
+  kConsumePayServerErr = 3204; // 消费钻石购买礼物 -500
+  kConsumePayConcurrentErr = 3205; // 并发请求 -505
+  kConsumePayFreeze = 3206; // -26   货币冻结
+
+  // 混合货币扣费返回码
+  kBatchConsumeAccountNotExist = 3250; // 账户不存在
+  KBatchConsumeConcurrentErr = 3251; // 并发更新失败
+  kBatchConsumeFrozenAccount = 3252; // 账号冻结
+  kBatchConsumeNotEnough = 3253; // 账号余额不足
+  kBatchConsumeParamErr = 3254; // 参数错误
+  kBatchConsumeSeqRepeat = 3255; // seq重复保存
+  kBatchConsumeServerErr = 3256; // 系统错误
+
+  kOverIssuedCurrencyAndProps = 3300; // -603 超发订单之外的货币和道具
+
+  kExchangePropLimited = 3400; // 兑换接口 2 超出限制
+  kExchangePropConfigError = 3401; // 兑换接口 -1 配置信息有误
+  kExchangePropNotEnough = 3402; // 兑换接口 -23 余额不足
+  kExchangePropSeqRepeated = 3403; // 兑换接口 -405 订单序号已存在
+  kExchangePropParamErr = 3404; // 兑换接口 -400 参数错误
+  kExchangePropServerErr = 3405; // 兑换接口 -500 内部错误
+  kExchangePropNotExists = 3406; // 兑换接口 -600 礼物or礼物价格不存在
+
+  // 4XXX 风控错误码
+  kRiskSnameError = 4000; //  风控 该Sname不能访问
+  kRiskActivityIdError = 4001; //  风控 该ActivityId不能访问
+  kRiskUIDError = 4002; //  风控 该UID不能访问
+  kRiskSnameActivityIdUIDError = 4003; //  风控 该Sname，ActivityId，UID，已达到风控的报警，不能访问
+  kRiskSignError = 4004; //  风控 该Sname sha1签名校验失败，不能访问
+}
+
+message QueryCouponSummaryReq {
+  int64 commodity_type = 1;
+  bool  need_msg_id = 2;
+  string game_id = 3;
+  string lang = 4;
+}
+
+message CouponSummaryItem {
+  int64 coupon_id = 1;
+  int64 count = 2;
+  repeated int64 coupon_id_list = 4;
+  repeated int64 msg_id_list = 5;
+  int64 nearest_expire_at = 6;
+  bool redDot = 7;
+  bool newTag = 8;
+}
+
+message QueryCouponSummaryRes {
+  common.Result result = 1;
+  bool msg_notification = 2;
+  repeated CouponSummaryItem items = 3;
+  string gameTips = 4;
+}
+
+message ReadMessageReq {
+  int64 commodity_type = 1;
+  repeated int64 coupon_id_list = 2;
+  repeated int64 msg_id_list = 3;
+}
+
+message ReadMessageRes {
+  common.Result result = 1;
+}

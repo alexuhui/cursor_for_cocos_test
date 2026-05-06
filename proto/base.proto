@@ -1,0 +1,46 @@
+//path='game'
+syntax = "proto3";
+
+// 这里放置一些所有模块都会共用的消息
+package pbm;
+
+// 房间状态,这里自行设定就好
+enum RoomStatus {
+    ROOM_STATUS_INITIAL = 0;
+    ROOM_STATUS_LOAD = 1;
+    ROOM_STATUS_PLAYING = 2;
+    ROOM_STATUS_FINISHED = 3;
+}
+
+message LoadProgressReq {
+    string uid = 1;
+    float progress = 3;
+}
+
+message LoadProgressRes {
+    int32 code = 14;
+    string msg = 15;
+    string uid = 1;
+    float progress = 2;
+}
+
+message ForceExitReq {
+}
+
+message ForceExitRes {
+    int32 code = 14;
+    string msg = 15;
+    string uid = 1;
+}
+
+message GiveUpReq {
+}
+
+message GiveUpRes {
+    int32 code = 14;
+    string msg = 15;
+    string uid = 1;
+}
+
+
+

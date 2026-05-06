@@ -1,8 +1,8 @@
 {
   "engine": "cocos-creator-js",
   "packages": "packages",
-  "name": "cursor_for_cocos_test",
-  "id": "9d532546-9fb4-4e0b-8f9a-19771c2c000c",
   "version": "2.4.6",
-  "isNew": false
+  "id": "fc2eef44-c8c7-4e0c-8378-b7f283a8a5cf",
+  "isNew": false,
+  "description": "hogame npm package"
 }

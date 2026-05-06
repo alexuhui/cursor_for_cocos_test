@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+// 服务注册名
+// 客户端会通过这个字段获取sname
+// 主命名空间：net.ihago
+// 子命名空间：ymicro (下面的服务类型对业务命名空间为保留字段)
+// 服务类型：srv/api/web/...
+// 服务名称：demo
+package net.ihago.money.api.gamepointsmall;
+
+option go_package = "gamepointsmall";
+option objc_class_prefix = "Gamepointsmall";
+
+import "moneyapicommon.proto";
+
+// 以下根据业务实际情况编写
+// 表示一个gamepointsmall服务.
+service Gamepointsmall {
+  //积分余额
+  rpc GetPoints(GetPointsReq) returns (GetPointsRes);
+}
+
+
+enum ECode {
+  OK = 0;
+  SRV_ERR             = 1000;
+  PARAM_ERR           = 1001;
+  UNAUTHORIZED        = 1002;
+  FORBIDDEN           = 1003;
+  FREQUENTLY          = 1004; // 请求频繁，请稍后重试
+  INVALID_USER        = 1005; // 非法用户
+
+  NOT_IN_ACT_TIME     = 2000; // 不在活动时间内
+  EXCHANGE_NUM_NOT_ENOUGH = 2005; // 兑换限制不足
+}
+
+
+//积分余额
+message GetPointsReq{
+
+}
+//积分余额
+message GetPointsRes{
+  common.Result result = 1;
+  int64 points = 10;
+  int64 expire_time = 11;
+  bool is_show = 12;
+}

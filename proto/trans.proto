@@ -1,0 +1,34 @@
+//path='game'
+syntax = "proto3";
+
+package pbm;
+
+import "moneyapicommon.proto";
+
+enum ECode {
+  ECodeOk = 0; // 成功
+  ECodeFrequenceError = 101; // 操作太频繁
+}
+
+message TransRequest {
+  string sname = 1;
+  string method = 2;
+  bytes req = 3;
+}
+
+message AggregateGetReq {
+  int64 sequence = 1;
+  repeated TransRequest requests = 2;
+}
+
+message TransResponse {
+  string sname = 1;
+  string method = 2;
+  bytes rsp = 3;
+}
+
+message AggregateGetRes {
+  common.Result result = 1;
+  int64 sequence = 2;
+  repeated TransResponse responses = 3;
+}

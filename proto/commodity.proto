@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+// 服务注册名
+// 客户端会通过这个字段获取sname
+// 主命名空间：net.ihago
+// 子命名空间：marcus (下面的服务类型对业务命名空间为保留字段)
+// 服务类型：srv/api/web/...
+// 服务名称：example
+
+package net.ihago.money.api.globalmetadata;
+
+// go的包名，引用时因为有git的项目路径作为命名空间，这里用短和清晰的名词
+option go_package = "globalmetadata";
+option objc_class_prefix = "Globalmetadata";
+
+import "moneyapicommon.proto";
+import "commodity_common.proto";
+import "commodity_extend.proto";
+
+// 商品元数据
+message Commodity {
+  // 商品元数据的全局id，表内自增
+  // int64 id = 1;
+  // 商品ID
+  int64 commodity_id = 2;
+
+  // 商品品类型
+  commodity.CommodityType commodity_type = 3;
+
+  // 商品单价
+  // Note:
+  //   - 若商品为时长类时, 发放永久商品时将会该价格, 否则会使用unit_value
+  //   - 调价改造后，使用 adj_value 字段
+  int64 value = 4;
+  // 调价后的商品单价. 对应的调价前价值为 value 字段
+  int64 adj_value = 5;
+
+  // 商品名称
+  string name = 6;
+
+  // 商品的单位有效期，单位: 秒
+  // Note:
+  //   - 单位有效期为商品发放/扣减等操作时的最小粒度，如：单位有效期为1小时, 则仅能发放1小时的整倍数时长
+  //   - 发放时价值计算为: 发放时长(非永久) / 单位有效期(unit_seconds) * 单位价值(unit_value)
+  int64 unit_seconds = 7;
+
+  // 多语言标注的商品名
+  map<string, string> languages = 9;
+
+  // 备注
+  string description = 10;
+
+  // 默认图标, 如果多语言有对应图标就用多语言对应图标, 否则用默认图标"
+  Resource icon = 11;
+
+  // h5图标
+  Resource h5_icon = 12;
+
+  // 商品创建的时间戳,单位秒
+  int64 create_time = 14;
+
+  // 商品元数据最后更新的时间戳,单位秒
+  int64 update_time = 15;
+
+  // 操作者
+  string operator = 16;
+
+  // 创建者
+  string creator = 17;
+
+  // 商品分类id, id分类最底层的id
+  int64 tab_id = 18;
+
+  // 商品单位有效期内的价格
+  // Note: 参考 unit_seconds 注释
+  //  调价后，使用 adj_unit_value 字段
+  int64 unit_value = 19;
+
+  // 商品资源
+  Resource resource = 21;
+
+  // 商品扩展属性
+  CommodityExtend commodity_extend = 22;
+
+  // 版本号
+  int64 version = 23;
+
+  // 多语言描述
+  map<string, string> descriptions = 26;
+}

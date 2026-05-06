@@ -1,0 +1,300 @@
+syntax="proto3";
+
+package commodity;
+
+option go_package="pbcommodity";
+
+// 资源类型
+enum CommodityType  {
+  // 无效枚举
+  CommodityTypeNone = 0;
+
+  // 3D商品 [1-49999]
+
+  // 营收中台货币 [1-99] Deprecated: 后续新货币都收到 CommodityTypeCurrency 中
+
+  // 水晶
+  CommodityTypeCrystal      = 1;
+  // 游戏货币
+  CommodityTypeGameCurrency = 2;
+  // chat货币
+  CommodityTypeChatCurrency = 3;
+
+  // 货币
+  CommodityTypeCurrency = 6;
+
+  // 营收中台道具 [100-499]
+
+  // 3D道具
+  CommodityTypeProp          = 100;
+  // 3D HM营收道具
+  CommodityTypeHMRevenueProp = 101;
+
+  // Hago业务商品 [500-2499]
+
+  // 个人装扮
+  CommodityTypePersonalDecorate = 500;
+  // 场景装饰
+  CommodityTypeSceneDecorate    = 501;
+  // 通用道具
+  CommodityTypeGeneralProp      = 502;
+  // 坐骑
+  CommodityTypeMount            = 503;
+  // 妆容
+  CommodityTypeMakeUp           = 504;
+  // 动作
+  CommodityTypeMotion           = 505;
+  // 3d场景
+  CommodityTypeScene            = 506;
+  // 家具券
+  CommodityTypeFurnitureCoupon  = 507;
+  // 3d会员包
+  CommodityTypeMembershipPack   = 508;
+  // 3d商城优惠券
+  CommodityTypeMallCoupon       = 509;
+  // 3d捏脸
+  CommodityTypeCustomFace       = 510;
+  // 3D房间座位
+  CommodityTypeRoomSeat         = 511;
+  // 金币商城货币
+  CommodityTypeCoinMallCurrency = 512;
+  // Hago&Manga 道具
+  CommodityTypeHMProp           = 513;
+  // 房间权限
+  CommodityTypeRoomPermission   = 514;
+  // AI商品(时长类)
+  CommodityTypeAIPropTime       = 515;
+
+  // 游戏道具(数量)
+  CommodityTypeGameProp         = 517;
+  // 游戏道具(时长)
+  CommodityTypeGamePropTime     = 518;
+  // 游戏体系经验值
+  CommodityTypeGameGrowthSysExp = 519;
+
+  // 特殊商品 [2500-2999]
+
+  // 活动自定义道具(数量)
+  CommodityTypeCustom     = 2500;
+  // 活动自定义道具(时长)
+  CommodityTypeCustomTime = 2501;
+
+  // 空奖品
+  CommodityTypeEmpty      = 2600;
+
+  // Hago业务元数据 [3000-4999]
+  // Note: 元数据不支持发放/扣减等操作
+
+  // 商品标签
+  CommodityTypeLabel      = 3000;
+  // 调色板
+  CommodityTypePalette    = 3001;
+
+
+  // 第三方商品类型 [8000-9999]
+
+  // ludo游戏道具(数量)
+  CommodityTypeGamePropLudo     = 8001;
+  // ludo游戏道具(时长)
+  CommodityTypeGamePropLudoTime = 8002;
+
+
+  // astro占星业务 (lumoschat) 商品 [11000-11999]
+
+  // lumoschat 会员
+  CommodityTypeAstroMembership    = 11000;
+  // lumoschat 能量值
+  CommodityTypeAstroPowerPoint    = 11001;
+  // lumoschat 幸运水晶
+  CommodityTypeAstroLuckCrystal   = 11002;
+  // lumoschat 货币
+  CommodityTypeAstroCurrency      = 11003;
+  // lumoschat 咨询券
+  CommodityTypeAstroConsultCoupon = 11004;
+
+  // infun 业务商品 [12000-12999]
+
+  // infun 房间标签
+  CommodityTypeInfunRoomLabel  = 12000;
+  // infun 货币
+  CommodityTypeInfunCurrency   = 12001;
+  // infun 头像框
+  CommodityTypeInfunHeadIcon   = 12002;
+  // infun 进场秀
+  CommodityTypeInfunInShow     = 12003;
+  // infun 聊天气泡
+  CommodityTypeInfunChatBubble = 12004;
+  // infun 房间背景图
+  CommodityTypeInfunRoomBgPic  = 12005;
+  // infun 大表情
+  CommodityTypeInfunBigEmoji   = 12006;
+  // infun 麦浪
+  CommodityTypeInfunMicWave    = 12007;
+  // infun 成员经验值
+  CommodityTypeInfunMemberExp  = 12008;
+  // infun 房间积分
+  CommodityTypeInfunRoomScore  = 12009;
+  // infun 营收礼物
+  CommodityTypeInfunGift       = 12010;
+  // infun 活跃货币礼物
+  CommodityTypeInfunActiveGift = 12011;
+  // infun 玩法特权
+  CommodityTypeInfunGameplayPrivilege = 12012;
+  // infun 房间封面
+  CommodityTypeInfunRoomCover  = 12013;
+  // infun 房间外框
+  CommodityTypeInfunRoomFrame  = 12014;
+  // infun 房间内容标签
+  CommodityTypeInfunRoomContentLabel = 12015;
+  // infun 关系进场秀(双人进场秀)
+  CommodityTypeInfunRelationInShow   = 12016;
+  // infun 用户标签
+  CommodityTypeInfunUserLabel  = 12017;
+
+  // infun 游戏代金券
+  CommodityTypeInfunGameVoucher           = 12035;
+  // infun 游戏加成券
+  CommodityTypeInfunGameBonusCoupon       = 12036;
+
+  // infun 自定义商品(数量类)
+  CommodityTypeInfunCustom     = 12901;
+  // infun 自定义商品(时长类)
+  CommodityTypeInfunCustomTime = 12902;
+  // infun 空奖品
+  CommodityTypeInfunEmpty      = 12999;
+
+  // videoGPT 业务商品 [13000-13999]
+
+  // videoGPT 货币
+  CommodityTypeVideoGPTCurrency = 13000;
+  // videoGPT 营收优惠券
+  CommodityTypeVideoGPTCoupon   = 13001;
+
+
+  // 2D特权 [50000+]
+
+  // 头像框
+  CommodityType2DHeadIcon            = 50001;
+  // 勋章
+  CommodityType2DMedal               = 50002;
+  // 进场秀
+  CommodityType2DInShow              = 50003;
+  // 特权大礼包
+  CommodityType2DPrivilegePack       = 50004;
+  // 礼物
+  CommodityType2DGift                = 50005;
+  // 福卡
+  CommodityType2DLuckyCard           = 50006;
+  // 钻石
+  CommodityType2DDiamond             = 50007;
+  // 金豆
+  CommodityType2DHagoGold            = 50008;
+  // 语音房背景图
+  CommodityType2DRoomBgPic           = 50009;
+  // 专属表情
+  CommodityType2DBigEmoji            = 50010;
+  // 优惠券
+  CommodityType2DCoupon              = 50011;
+  // 聊天气泡
+  CommodityType2DChatBubble          = 50012;
+  // 面具
+  CommodityType2DMask                = 50013;
+  // 锤子
+  CommodityType2DHammer              = 50014;
+  // 特权商城兑换券
+  CommodityType2DPrivilegeMallTicket = 50015;
+  // 付费等级财富点
+  CommodityType2DPayLevelScore       = 50016;
+  // svip积分
+  CommodityType2DSVIPScore           = 50017;
+  // 红包
+  CommodityType2DRedPacket           = 50018;
+  // 游戏币红宝石
+  CommodityType2DGameCoin            = 50019;
+  // 天天抽奖代金券
+  CommodityType2DDailyDrawCoupon     = 50020;
+  // 付费等级充能任务能量值
+  CommodityType2DPayLevelPower       = 50021;
+  // 越南svip积分
+  CommodityType2DSvipvnScore         = 50022;
+  // diy push特权
+  CommodityType2DDiyPush             = 50023;
+  // 包裹
+  CommodityType2DPackage             = 50024;
+  // 迷你资料卡
+  CommodityType2DUserCardBg          = 50025;
+  // 弹幕喊话
+  CommodityType2DShout               = 50026;
+  // 家族金库钻石
+  CommodityType2DCoffersDiamond      = 50027;
+  // 贵族体验卡
+  CommodityType2DNobleExpCard        = 50028;
+  // 等级加速卡
+  CommodityType2DLevelQuickenCard    = 50029;
+  // 大表情扭蛋券
+  CommodityType2DEmojiGashaponTicket = 50030;
+  // 用户等级经验值
+  CommodityType2DUserLevelScore      = 50031;
+  // 家族相关奖励
+  CommodityType2DFamilyReward        = 50032;
+  // 礼物流光
+  CommodityType2DGiftEffect          = 50033;
+  // 帽子
+  CommodityType2DHat                 = 50034;
+  // 充值积分
+  CommodityType2DRechargePoint       = 50035;
+  // 麦位特权
+  CommodityType2DWheat               = 50036;
+  // 封面标签
+  CommodityType2DLiveCoverLabel      = 50037;
+  // 主题房卡
+  CommodityType2DThemeRoomCard       = 50038;
+  // 上麦动效特权
+  CommodityType2DMicDynamic          = 50039;
+  // 麦上身份标志特权
+  CommodityType2DMicIDMark           = 50040;
+  // 营收消费优惠券
+  CommodityType2DConsumeCoupon       = 50041;
+  // 房间封面外框
+  CommodityType2DRoomCoverFrame      = 50042;
+
+  // 空奖品
+  CommodityType2DEmpty = 50100;
+
+  // 头像框碎片
+  CommodityType2DHeadIconPiece   = 50101;
+  // 勋章碎片
+  CommodityType2DMedalPiece      = 50102;
+  // 进场秀碎片
+  CommodityType2DInshowPiece     = 50103;
+  // 背景图碎片
+  CommodityType2DRoomBGPiece     = 50109;
+  // 专属表情碎片
+  CommodityType2DBigEmojiPiece   = 50110;
+  // 聊天气泡碎片
+  CommodityType2DChatBubblePiece = 50112;
+  // 面具碎片
+  CommodityType2DMaskPiece       = 50113;
+  // 麦位边框
+  CommodityType2DWheatFrame      = 50114;
+
+  // 活动自定义道具(数量)
+  CommodityType2DCustom     = 51000;
+  // 活动自定义道具(时长)
+  CommodityType2DCustomTime = 51001;
+
+}
+
+// 商品奖励信息 (用于商品发放/回收/冻结等操作)
+message CommodityReward {
+  // 商品类型
+  CommodityType commodity_type = 2;
+  // 商品ID
+  int64 commodity_id           = 3;
+  // 数量, 仅表示数量
+  // Note: 若商品数据时长类，则本字段会被忽略(值必然为1)
+  int64 count                  = 4;
+  // 有效期, 单位: 秒
+  // Note: 表示
+  int64 expire_second          = 5;
+}

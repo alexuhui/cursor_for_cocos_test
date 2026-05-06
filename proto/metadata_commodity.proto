@@ -1,0 +1,97 @@
+syntax = "proto3";
+
+// 服务注册名
+// 客户端会通过这个字段获取sname
+// 主命名空间：net.ihago
+// 子命名空间：marcus (下面的服务类型对业务命名空间为保留字段)
+// 服务类型：srv/api/web/...
+// 服务名称：example
+
+package net.ihago.money.api.metadata;
+
+// go的包名，引用时因为有git的项目路径作为命名空间，这里用短和清晰的名词
+option go_package = "metadata";
+option objc_class_prefix = "metadata";
+
+import "moneyapicommon.proto";
+import "commodity_common.proto";
+import "commodity_extend.proto";
+import "commodity.proto";
+
+// 商品相关处理接口
+service CommodityApi {
+  // 批量获取商品信息
+  rpc BatchGetCommodities(BatchGetCommoditiesReq) returns (BatchGetCommoditiesRes) {}
+
+  // 获取商品信息
+  rpc GetCommodity(GetCommodityReq) returns (GetCommodityRes) {}
+}
+
+// 商品类型和商品id组合的查询条件
+message CommoditySpecified {
+  // 商品类型
+  commodity.CommodityType commodity_type = 1;
+  // 商品ID
+  int64 commodity_id                     = 2;
+  // 版本号
+  // Note:
+  //   - 填0则返回最新的商品信息
+  //   - 填写非0时, 若 version 与服务端当前版本号相等时则不会返回, 否则将会返回最新的商品信息
+  int64 version                          = 3;
+}
+
+// 商品信息筛选
+message CommodityFilter {
+  // 多语言过滤, 仅会返回指定的一种语言
+  // Note: 默认返回所有语言
+  string language = 1;
+}
+
+// 批量获取商品信息
+message BatchGetCommoditiesReq {
+  // 商品列表
+  repeated CommoditySpecified commodities = 1;
+  // 商品信息筛选
+  CommodityFilter filter                  = 2;
+  // 是否仅返回简单信息(仅包含通用字段: type,id,name,icon 等). 默认返回完整信息
+  bool is_simplify                        = 3;
+  // is_simplify=true 时，是否返回 commodity_extend 信息
+  bool use_extend                         = 4;
+}
+
+message BatchGetCommoditiesRes {
+  // 返回结果
+	common.Result result = 1;
+	// 需要更新商品信息
+  repeated net.ihago.money.api.globalmetadata.Commodity commodities = 10;
+  // 已经缓存的商品列表
+  // Note: 表示业务缓存的商品信息已经是最新的，不需要再更新
+  repeated CommoditySpecified cached_commodities                    = 11;
+}
+
+// 批量获取商品信息基础字段
+message BatchGetCommoditySimplifyInfoReq {
+  // 商品列表
+  repeated CommoditySpecified commodities = 1;
+  // 商品信息筛选, 可选
+  CommodityFilter filter                  = 2;
+  // 是否返回 commodity_extend 信息
+  bool use_extend                         = 3;
+}
+
+// 获取某个商品信息
+message GetCommodityReq {
+  // 商品类型
+  commodity.CommodityType commodity_type = 1;
+  // 商品id
+  int64 commodity_id                     = 2;
+  // 商品信息筛选
+  CommodityFilter filter                 = 3;
+}
+message GetCommodityRes {
+  // 返回结果
+  common.Result result = 1;
+
+  // 需要更新商品信息
+  net.ihago.money.api.globalmetadata.Commodity commodity = 10;
+}

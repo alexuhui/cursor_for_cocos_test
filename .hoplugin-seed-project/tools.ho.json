@@ -1,0 +1,78 @@
+{
+    "supers": [],
+    "quickPicks": [
+        {
+            "name": "quickPick_updateTools",
+            "access": "public",
+            "displayInfo": {
+                "label": "更新种子项目工具",
+                "detail": "拷贝种子项目下tools目录和.hoplugin-seed-project目录"
+            },
+            "pickTrigger": {
+                "type": "shell",
+                "names": ["shell_update_tools"]
+            }
+        },
+        {
+            "name": "quickPick_updateGea",
+            "access": "public",
+            "displayInfo": {
+                "label": "更新gea模块",
+                "detail": "从种子项目更新gea模块的.js文件、.js.map文件、.d.ts文件"
+            },
+            "pickTrigger": {
+                "type": "shell",
+                "names": ["shell_update_gea"]
+            }
+        },
+        {
+            "name": "quickPick_compile_ts_tools",
+            "access": "public",
+            "displayInfo": {
+                "label": "编译工具ts源码到js",
+                "detail": "更新tools/ts目录下的ts源码到tools目录供nodejs调用"
+            },
+            "pickTrigger": {
+                "type": "shell",
+                "names": ["shell_compile_tools_ts"]
+            }
+        },
+        {
+            "name": "quickPick_tslint_fix_all",
+            "access": "public",
+            "displayInfo": {
+                "label": "修复整个项目的Tslint警告",
+                "detail": "tslint --fix -p ../"
+            },
+            "pickTrigger": {
+                "type": "shell",
+                "names": ["shell_tslint_fix_all"]
+            }
+        }
+    ],
+    "shells": [
+        {
+            "name": "shell_update_tools",
+            "access": "private",
+            "shell": "node",
+            "args": ["../tools/update-project.js"]
+        },
+        {
+            "name": "shell_update_gea",
+            "access": "private",
+            "shell": "node",
+            "args": ["../tools/update-gea.js"]
+        },
+        {
+            "name": "shell_compile_tools_ts",
+            "access": "private",
+            "shell": "tsc",
+            "args": ["-p ../tools/ts"]
+        },
+        {
+            "name": "shell_tslint_fix_all",
+            "access": "private",
+            "shell": "tslint --fix -p ../"
+        }
+    ]
+}

@@ -1,0 +1,14 @@
+{
+    "shells": [
+        {
+            "access": "public",
+            "name": "shell_publish",
+            "shell": "node ../tools/publish/publish-project.js",
+            "args": [
+                "C:\\CocosDashboard_1.2.5\\resources\\.editors\\Creator\\2.4.6\\CocosCreator.exe",
+                "E:\\Cocos\\Creator\\2.4.6\\CocosCreator.exe",
+                "D:\\CocosCreator\\Creator\\2.4.6\\CocosCreator.exe"
+            ]
+        }
+    ]
+}
