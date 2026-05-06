@@ -1,3 +1,4 @@
+import '../../script/svga/proto'
 import { PBEnums } from '../proto/PBEnums'
 import ease = gea.enums.tween.ease;
 
