@@ -1,33 +1,72 @@
-# cursor_for_cocos_test
+# Crash Rocket
 
-用于在 **Cocos Creator 2.4.6** 环境下，配合 **Cursor** 编辑器进行开发与协作的流程与能力验证（脚手架 / 脚本补全 / 重构 / 约定说明等）。
+## 启动流程
+1. 加载空场景
+- `Launcher.fire`是一个空场景，加载速度会很快，避免加载主场景耗时导致首帧出现之前黑屏问题；
+- 激活`GameFramework`框架，启动游戏加载流程；
+- `ProcedureComponent`流程启动入口；
+2. 播放加载动画
+- `ProcedureSplash.ts`控制加载动画播放；
+3. 预加载资源
+- `ProcedurePreload.ts`控制资源预加载；
+  - 主场景`Main.fire`预加载；
+  - 多语言资源预加载；
+4. 用户登录
+- `ProcedureLogin.ts`控制用户登录；
+5. 加载主场景
+- `ProcedureChangeScene.ts`控制主场景加载；
+  - 停止加载动画；
+  - 进入主场景；
 
-## 环境要求
+## 数据组织
+纯数据逻辑相关建议继承自`AbsModule`类，具体用法可以参考`LoginModule`;
 
-| 组件 | 版本 |
-|------|------|
-| Cocos Creator | **2.4.6**（与仓库内 `project.json` 中的 `version` 一致） |
-| 编辑器 | Cursor（本仓库主要在 Cursor 中编辑与迭代） |
+## 日志
+日志打印建议统一使用框架提供的`gea.info`、`gea.warn`、`gea.error`等方法，避免使用`console.log`等方法；
+方便对log输出做一些统一处理，如：根据游戏加上前缀等；
 
-> 建议使用与项目版本一致的 Creator，避免脚本 API、构建链与引擎行为差异。
+## 多语言
+1. 对于固定文案，可以在`cc.Label`节点下直接挂载`TextLocalizationComponent.ts`脚本，填入对应的多语言key；
+2. 对于动态文案，使用下面方式获取多语言文本：
 
-## 打开项目
+```typescript
+import {getFrameworkModule} from "./GameFrameworkEntry";
+import LocalizationModule from "./LocalizationModule";
 
-1. 启动 **Cocos Creator 2.4.6**。
-2. 选择「打开项目」，指向本仓库根目录（含 `project.json` 的目录）。
-3. 首次打开可按需等待资源索引与编译完成后再运行场景。
+const text = getFrameworkModule(LocalizationModule).getText("key", "param1", "param2");
+```
 
-## 关于 Cursor × Cocos 的实践要点（简要）
+## 资源加载
+建议使用`Resource`模块提供的资源加载方法，避免使用`cc.loader.loadRes`等方法；
 
-- **脚本**：Creator 2.x 一般为 JavaScript / TypeScript 组件脚本；在 Cursor 中可针对具体 `.js` / `.ts` 与场景引用做增量修改，避免大范围无关改动。
-- **资源与 meta**：若仓库中存在 `assets` 及 `.meta`，版本管理时注意与 Creator 保持同步，减少 UUID 与引用断裂。
-- **生成代码**：让 AI 生成组件时，尽量说明生命周期（如 `onLoad` / `start` / `update`）、节点获取方式（`cc.find` / 属性绑定）及 2.4.x API，便于一次对齐引擎版本。
+```typescript
+import {getFrameworkModule} from "./GameFrameworkEntry";
+import ResourceModule from "./ResourceModule";
 
-## 仓库说明
+getFrameworkModule(ResourceModule).loadAsset("prefab/Test", cc.Prefab, (error, asset) => {
+})
+```
 
-- 项目标识见根目录 `project.json`（`engine`: `cocos-creator-js`，`version`: `2.4.6`）。
-- `library`、`local`、`temp` 等目录多为引擎与本地缓存生成内容；协作时通常以 `.gitignore` 约定是否纳入版本库。
+## 本地存储
+建议使用`Setting`模块提供的本地存储方法，避免使用`cc.sys.localStorage`等方法；
+`Setting`模块区分`App`和`User`存储；
 
-## 许可
+```typescript
+import {getFrameworkModule} from "./GameFrameworkEntry";
+import {AppSettingModule} from "./AppSettingModule";
 
-如无单独许可文件，以团队或上级仓库约定为准。
+getFrameworkModule(AppSettingModule).setBoolean("test", false)
+
+getFrameworkModule(AppSettingModule).getBoolean("test", false)
+```
+
+## 图片加载
+建议使用`ImageLoader`提供的图片加载方法，避免使用`cc.loader.loadRes`等方法；
+```typescript
+// 加载本地图片
+ImageLoader.loadlocal(path: string, sprite: cc.Sprite, onComplete?: (success: boolean) => void)
+
+// 加载网络图片
+ImageLoader.loadRemote(url: string, sprite: cc.Sprite, onComplete?: (success: boolean) => void)
+```
+
