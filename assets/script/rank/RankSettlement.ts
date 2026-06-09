@@ -21,19 +21,10 @@ export default class RankSettlement extends cc.Component {
         if (!this.view) {
             this.view = this.getComponent(RankSettlementView);
         }
-        this.bindOkBtn();
     }
 
     start() {
         this.startRoll();
-    }
-
-    /** 绑定 OK 按钮点击关闭 */
-    private bindOkBtn(): void {
-        if (!this.view || !this.view.okBtn) {
-            return;
-        }
-        this.view.okBtn.on(cc.Node.EventType.TOUCH_END, this.onOkClick, this);
     }
 
     /** 从 0 滚动到目标奖励值 */
@@ -69,14 +60,8 @@ export default class RankSettlement extends cc.Component {
         return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
 
-    /** 点击 OK 关闭弹窗 */
-    private onOkClick(): void {
+    /** 点击 OK 关闭弹窗（预制体 Button 点击回调） */
+    onOkClick(): void {
         this.node.destroy();
-    }
-
-    onDestroy() {
-        if (this.view && this.view.okBtn) {
-            this.view.okBtn.off(cc.Node.EventType.TOUCH_END, this.onOkClick, this);
-        }
     }
 }
