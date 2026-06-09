@@ -1,0 +1,146 @@
+
+free_diamond_yellow.png
+size: 2048,128
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+coins1
+  rotate: false
+  xy: 2, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1
+coins11
+  rotate: false
+  xy: 2, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1
+coins10
+  rotate: false
+  xy: 1172, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1
+coins20
+  rotate: false
+  xy: 1172, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1
+coins2
+  rotate: false
+  xy: 132, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1
+coins12
+  rotate: false
+  xy: 132, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1
+coins3
+  rotate: false
+  xy: 262, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1
+coins13
+  rotate: false
+  xy: 262, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1
+coins4
+  rotate: false
+  xy: 392, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1
+coins14
+  rotate: false
+  xy: 392, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1
+coins5
+  rotate: false
+  xy: 522, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1
+coins15
+  rotate: false
+  xy: 522, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1
+coins6
+  rotate: false
+  xy: 652, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1
+coins16
+  rotate: false
+  xy: 652, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1
+coins7
+  rotate: false
+  xy: 782, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1
+coins17
+  rotate: false
+  xy: 782, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1
+coins8
+  rotate: false
+  xy: 912, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1
+coins18
+  rotate: false
+  xy: 912, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1
+coins9
+  rotate: false
+  xy: 1042, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1
+coins19
+  rotate: false
+  xy: 1042, 2
+  size: 128, 114
+  orig: 128, 114
+  offset: 0, 0
+  index: -1

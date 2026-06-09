@@ -15,8 +15,13 @@ export default class RankSettlementView extends cc.Component {
     @property(cc.Node)
     bgPanel: cc.Node = null;
 
+    @property(sp.Skeleton)
+    diamondSpine: sp.Skeleton = null;
+
     titleLabel: cc.Label = null;
     rewardLabel: cc.Label = null;
+
+    private readonly diamondAnim = 'result_diamond_yellow';
 
     onLoad() {
         if (this.titleLabelNode) {
@@ -25,5 +30,18 @@ export default class RankSettlementView extends cc.Component {
         if (this.rewardLabelNode) {
             this.rewardLabel = this.rewardLabelNode.getComponent(cc.Label);
         }
+        this.diamondSpine.setCompleteListener((entry) => {
+            if (entry.animation.name === this.diamondAnim) {
+                // 动画播完，可按需追加逻辑
+            }
+        });
+    }
+
+    onEnable() {
+        this.diamondSpine.setAnimation(0, this.diamondAnim, false);
+    }
+
+    protected onDestroy(): void {
+        this.diamondSpine.setCompleteListener(null);
     }
 }
