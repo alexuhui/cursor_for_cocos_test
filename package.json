@@ -1,32 +1,32 @@
 {
-    "name": "hogmae",
-    "version": "1.0.0",
-    "repository": {
-        "type": "git",
-        "url": ""
-    },
-    "description": "hogame npm package",
-    "main": "index.js",
-    "dependencies": {
-        "xlsx": "^0.18.5"
-    },
-    "devDependencies": {
-        "@types/archiver": "^3.0.0",
-        "@types/node-xlsx": "^0.12.1",
-        "@types/request": "^2.48.3",
-        "@types/unzip": "^0.1.1",
-        "archiver": "^3.1.1",
-        "node-xlsx": "^0.15.0",
-        "pako": "^1.0.6",
-        "protobufjs": "^6.8.8",
-        "request": "^2.88.0",
-        "request-progress": "^3.0.0",
-        "typescript": "^4.3.5",
-        "unzip": "^0.1.11"
-    },
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "author": "",
-    "license": "ISC"
+  "name": "hogmae",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "description": "hogame npm package",
+  "main": "index.js",
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/archiver": "^3.0.0",
+    "@types/node-xlsx": "^0.12.1",
+    "@types/request": "^2.48.3",
+    "@types/unzip": "^0.1.1",
+    "archiver": "^3.1.1",
+    "node-xlsx": "^0.15.0",
+    "pako": "^1.0.6",
+    "protobufjs": "^6.8.8",
+    "request": "^2.88.0",
+    "request-progress": "^3.0.0",
+    "typescript": "^4.3.5",
+    "unzip": "^0.1.11"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
 }
