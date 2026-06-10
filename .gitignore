@@ -11,3 +11,4 @@ settings/creator-luacpp-support.json
 /.idea
 .vscode
 .cursor
+.cursor/figma.config.json

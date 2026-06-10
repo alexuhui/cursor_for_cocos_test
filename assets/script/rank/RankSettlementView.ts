@@ -15,10 +15,18 @@ export default class RankSettlementView extends cc.Component {
     @property(cc.Node)
     bgPanel: cc.Node = null;
 
+    @property(cc.Node)
+    rankLabelNode: cc.Node = null;
+
+    @property(cc.Node)
+    dateLabelNode: cc.Node = null;
+
     @property(sp.Skeleton)
     diamondSpine: sp.Skeleton = null;
 
     titleLabel: cc.Label = null;
+    rankLabel: cc.Label = null;
+    dateLabel: cc.Label = null;
     rewardLabel: cc.Label = null;
 
     private readonly diamondAnim = 'result_diamond_yellow';
@@ -26,6 +34,12 @@ export default class RankSettlementView extends cc.Component {
     onLoad() {
         if (this.titleLabelNode) {
             this.titleLabel = this.titleLabelNode.getComponent(cc.Label);
+        }
+        if (this.rankLabelNode) {
+            this.rankLabel = this.rankLabelNode.getComponent(cc.Label);
+        }
+        if (this.dateLabelNode) {
+            this.dateLabel = this.dateLabelNode.getComponent(cc.Label);
         }
         if (this.rewardLabelNode) {
             this.rewardLabel = this.rewardLabelNode.getComponent(cc.Label);
