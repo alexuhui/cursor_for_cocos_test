@@ -4,9 +4,9 @@ const { ccclass, property } = cc._decorator;
 export default class Main extends cc.Component {
 
     onLoad() {
-        cc.resources.load('prefab/rank/RankSettlementPopup', cc.Prefab, (err, prefab: cc.Prefab) => {
+        cc.resources.load('prefab/ListPageView/ListPageTestPanel', cc.Prefab, (err, prefab: cc.Prefab) => {
             if (err) {
-                cc.error('Load RankSettlementPopup failed:', err);
+                cc.error('Load ListPageTestPanel failed:', err);
                 return;
             }
             const node = cc.instantiate(prefab);
