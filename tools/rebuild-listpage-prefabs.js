@@ -1,5 +1,7 @@
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 const http = require('http');
 
 const PORT = 3456;
@@ -7,8 +9,17 @@ const ITEM_URL = 'db://assets/resources/prefab/ListPageView/ListPageTestItem.pre
 const PANEL_URL = 'db://assets/resources/prefab/ListPageView/ListPageTestPanel.prefab';
 const LIST_PAGE_VIEW_SCRIPT = 'db://assets/script/com/ListPage/ListPageView.ts';
 const SCROLL_CONTENT_PATH = 'ListPageTestPanel/recordScroll/view/content';
+const PANEL_ROOT_PATH = 'ListPageTestPanel';
+const RECORD_SCROLL_PATH = 'ListPageTestPanel/recordScroll';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function readAssetUuidFromMeta(dbUrl) {
+    const rel = dbUrl.replace(/^db:\/\/assets\//, 'assets/');
+    const metaPath = path.join(__dirname, '..', rel + '.meta');
+    const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+    return meta.uuid;
+}
 
 function callTool(name, args) {
     return new Promise((resolve, reject) => {
@@ -68,14 +79,18 @@ async function createItemPrefab() {
             ],
             scripts: [{
                 scriptUrl: 'db://assets/script/test/ListPageTestItem.ts',
-                props: { indexTxt: 'indexTxt', timeTxt: 'timeTxt', incomeTxt: 'incomeTxt' },
+                props: {
+                    indexTxt: { ref: 'indexTxt', as: 'cc.Label' },
+                    timeTxt: { ref: 'timeTxt', as: 'cc.Label' },
+                    incomeTxt: { ref: 'incomeTxt', as: 'cc.Label' },
+                },
             }],
         },
     });
     console.log(res.message || res);
 }
 
-async function createPanelPrefab() {
+async function createPanelPrefab(itemPrefabUuid) {
     console.log('2. prefab_create_new ListPageTestPanel (ScrollView + ListPageView via components)');
     const res = await callTool('prefab_create_new', {
         url: PANEL_URL,
@@ -97,9 +112,8 @@ async function createPanelPrefab() {
                     fontSize: 24,
                     clickHandler: {
                         handler: 'onClickRefresh',
-                        target: 'ListPageTestPanel',
+                        targetPath: PANEL_ROOT_PATH,
                         component: 'ListPageTestPanel',
-                        scriptUrl: 'db://assets/script/test/ListPageTestPanel.ts',
                     },
                 },
                 {
@@ -113,9 +127,8 @@ async function createPanelPrefab() {
                     fontSize: 24,
                     clickHandler: {
                         handler: 'onClickInsert',
-                        target: 'ListPageTestPanel',
+                        targetPath: PANEL_ROOT_PATH,
                         component: 'ListPageTestPanel',
-                        scriptUrl: 'db://assets/script/test/ListPageTestPanel.ts',
                     },
                 },
                 {
@@ -154,7 +167,12 @@ async function createPanelPrefab() {
                                 paddingBottom: 8,
                                 bufferCount: 2,
                                 loadMoreThreshold: 80,
-                                tmpPrefab: { url: ITEM_URL },
+                                tmpPrefab: { uuid: itemPrefabUuid },
+                                loadMoreEvent: {
+                                    targetPath: PANEL_ROOT_PATH,
+                                    component: 'ListPageTestPanel',
+                                    handler: 'onLoadMore',
+                                },
                             },
                         },
                     ],
@@ -162,7 +180,10 @@ async function createPanelPrefab() {
             ],
             scripts: [{
                 scriptUrl: 'db://assets/script/test/ListPageTestPanel.ts',
-                props: { statusLabel: 'statusLabel' },
+                props: {
+                    statusLabel: { ref: 'statusLabel', as: 'cc.Label' },
+                    listPageView: { nodePath: RECORD_SCROLL_PATH, as: 'ListPageView' },
+                },
             }],
         },
     });
@@ -171,7 +192,9 @@ async function createPanelPrefab() {
 
 async function main() {
     await createItemPrefab();
-    await createPanelPrefab();
+    await sleep(1500);
+    const itemUuid = readAssetUuidFromMeta(ITEM_URL);
+    await createPanelPrefab(itemUuid);
     await callTool('editor_refresh', { path: 'db://assets/resources/prefab/ListPageView/' });
     await sleep(800);
     console.log('Done. Prefabs created via ai_prefab Scene API (assetdb.copy + prefab_open + populate + save).');

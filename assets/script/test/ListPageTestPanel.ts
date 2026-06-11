@@ -19,52 +19,12 @@ export default class ListPageTestPanel extends cc.Component {
     /** 重刷/翻页请求序号，用于丢弃过期的异步回调 */
     private fetchToken: number = 0;
 
-    onLoad() {
-        if (!this.listPageView) {
-            const scrollNode = this.node.getChildByName('recordScroll');
-            if (scrollNode) {
-                this.listPageView = scrollNode.getComponent(ListPageView);
-            }
-        }
-        if (!this.listPageView) {
-            return;
-        }
-        const loadHandler = new cc.Component.EventHandler();
-        loadHandler.target = this.node;
-        loadHandler.component = 'ListPageTestPanel';
-        loadHandler.handler = 'onLoadMore';
-        this.listPageView.loadMoreEvent = loadHandler;
-        const renderHandler = new cc.Component.EventHandler();
-        renderHandler.target = this.node;
-        renderHandler.component = 'ListPageTestPanel';
-        renderHandler.handler = 'onListRender';
-        this.listPageView.renderEvent = renderHandler;
-        this.bindPanelButtons();
-    }
-
-    /** 预制体 ClickEvent 可能绑错 target，运行时兜底注册按钮 */
-    private bindPanelButtons(): void {
-        const refreshBtn = this.node.getChildByName('btnRefresh');
-        if (refreshBtn) {
-            refreshBtn.off('click', this.onClickRefresh, this);
-            refreshBtn.on('click', this.onClickRefresh, this);
-        }
-        const insertBtn = this.node.getChildByName('btnInsert');
-        if (insertBtn) {
-            insertBtn.off('click', this.onClickInsert, this);
-            insertBtn.on('click', this.onClickInsert, this);
-        }
-    }
-
     start() {
         this.reloadFromScratch();
     }
 
     /** 按钮：重刷数据（reset + 从第 1 页重新拉取） */
     onClickRefresh(): void {
-        if (!this.listPageView) {
-            return;
-        }
         this.reloadFromScratch();
     }
 
